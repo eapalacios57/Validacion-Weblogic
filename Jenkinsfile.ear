@@ -246,13 +246,11 @@ pipeline {
             when { anyOf { branch 'develop';  branch 'stage'; } } 
             steps{
                 script{
-                    if( (statusCodeStop == 'success' && statusCodeUndeploy == 'success') || statusCodeStop != 'success' ){
                         sshCommand remote: remote, sudo:true, command:"test -f ${pathWl}/DeploysTemp/${BRANCH_NAME} || sudo mkdir -p ${pathWl}/DeploysTemp/${BRANCH_NAME} && sudo chown -R wlogic12c:oinstall ${pathWl}/"                                
                         sshCommand remote: remote, sudo:true, command:"mv /home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME}/${artifactNameWl}.${extension} ${pathWl}/DeploysTemp/${BRANCH_NAME}"
                         sshCommand remote: remote, sudo:true, command:"chown  wlogic12c:oinstall ${pathWl}/DeploysTemp/${BRANCH_NAME}/${artifactNameWl}.${extension}"
 
                         sshCommand remote: remote, command:"cd ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -deploy -source ${pathWl}/DeploysTemp/${BRANCH_NAME}/${artifactNameWl}.${extension} -targets ${clusterWl} -usenonexclusivelock"
-                    }
                 }
             }
             post {
