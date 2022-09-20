@@ -243,7 +243,7 @@ pipeline {
             environment {
                 WEBLOGIC_CREDENTIAL = credentials("${idUserANDPassWl}")
             }  
-            when { anyOf { branch 'develop';  branch 'stage'; } } 
+            when { anyOf {  branch 'stage'; } } 
             steps{
                 script{
                         sshCommand remote: remote, sudo:true, command:"test -f ${pathWl}/DeploysTemp/${BRANCH_NAME} || sudo mkdir -p ${pathWl}/DeploysTemp/${BRANCH_NAME} && sudo chown -R wlogic12c:oinstall ${pathWl}/"                                
