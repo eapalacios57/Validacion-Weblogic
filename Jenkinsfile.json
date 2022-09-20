@@ -9,6 +9,7 @@
         "clusterWl": "Transversales3",                                                        
         "serverWlSsh":"10.1.20.14",
         "puertoWlSsh":22,
-        "projectName":"Birc"
+        "projectName":"Birc",
+        "extension":"war"
     }
 }
