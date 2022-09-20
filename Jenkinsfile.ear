@@ -84,28 +84,6 @@ pipeline {
                     }
                 }
             }
-            post {
-                success {
-                    println "Upload Artifact <<<<<< success >>>>>>"
-                    script{
-                        statusCode='success';
-                    }    
-                }
-                unstable {
-                    println "Upload Artifact <<<<<< unstable >>>>>>"
-                    script{
-                        statusCode='unstable';
-                    }
-                }
-                failure {
-                    println "Upload Artifact <<<<<< failure >>>>>>"
-                    script{
-                        statusCode='failure';
-                        sshCommand remote: remote, sudo: true, command:"rm -rf ${pathwl}/DeploysTemp/${JOB_BASE_NAME}/${artifactNameWl}.${extension}"
-                    }
-                }
-            }
-                
         }
         // stage('Stop App'){
         //     agent {
