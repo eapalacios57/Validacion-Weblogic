@@ -280,21 +280,12 @@ pipeline {
                     println "Stage Deploy <<<<<< failure >>>>>>"
                 
                     script{
-                        if( statusCodeStop == 'success' && statusCodeUndeploy == 'success' ){
-
-                            echo "2. desplegar de la carpeta deploy";
-                            sshCommand remote: remote, command:"cd ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -deploy -source ${pathWl}/Deploy/${JOB_BASE_NAME}/${artifactNameWl}.${extension} -targets ${clusterWl} -usenonexclusivelock"
-                            
-                            //validar la necesidad de realizar el start
-                            //echo "3. start a la aplicación";
-                            //sshCommand remote: remote, command:"cd ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -start -name ${artifactNameWl}"
-                            
-                        }else if( statusCodeStop == 'success' && statusCodeUndeploy != 'success' ){
-                            echo "No se pudo desplegar verificar que el ambiente se encuentre estable con la version anterior";
+                        echo "2. desplegar de la carpeta deploy";
+                        sshCommand remote: remote, command:"cd ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -deploy -source ${pathWl}/Deploy/${JOB_BASE_NAME}/${artifactNameWl}.${extension} -targets ${clusterWl} -usenonexclusivelock"
                         
-                        }else if( statusCodeStop != 'success'){
-                            echo "No se pudo desplegar, por favor verificar por que no se encontro un artefacto inicial para restaurar";
-                        }
+                        //validar la necesidad de realizar el start
+                        //echo "3. start a la aplicación";
+                        //sshCommand remote: remote, command:"cd ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -start -name ${artifactNameWl}"
                         
                         statusCode='failure';
                     }
