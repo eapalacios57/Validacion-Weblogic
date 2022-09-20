@@ -47,15 +47,15 @@ pipeline {
                 script{
                     
                    JENKINS_FILE = readJSON file: 'Jenkinsfile.json';
-                   urlWlBirc  = JENKINS_FILE[BRANCH_NAME]['urlWlBirc'];
-                   idUserANDPassWlBirc = JENKINS_FILE[BRANCH_NAME]['idUserANDPassWlBirc'];
+                   urlWl  = JENKINS_FILE[BRANCH_NAME]['urlWl'];
+                   idUserANDPassWl = JENKINS_FILE[BRANCH_NAME]['idUserANDPassWl'];
                    idUserANDPassShh = JENKINS_FILE[BRANCH_NAME]['idUserANDPassShh'];
-                   artifactNameWlBirc = "TrainingSite-1.0-SNAPSHOT";
-                   domainWlBirc = JENKINS_FILE[BRANCH_NAME]['domainWlBirc'];
-                   pathwlBirc = JENKINS_FILE[BRANCH_NAME]['pathwlBirc'];
-                   clusterWlBirc = JENKINS_FILE[BRANCH_NAME]['clusterWlBirc'];
+                   artifactNameWl = "TrainingSite-1.0-SNAPSHOT";
+                   domainWl = JENKINS_FILE[BRANCH_NAME]['domainWl'];
+                   pathwl = JENKINS_FILE[BRANCH_NAME]['pathwl'];
+                   clusterWl = JENKINS_FILE[BRANCH_NAME]['clusterWl'];
                    extension = JENKINS_FILE[BRANCH_NAME]['extension'];
-                    projectName = JENKINS_FILE[BRANCH_NAME]['projectName'];
+                   projectName = JENKINS_FILE[BRANCH_NAME]['projectName'];
 
                    remote.name = projectName
                    remote.host = JENKINS_FILE[BRANCH_NAME]['serverWlSsh']
