@@ -55,8 +55,9 @@ pipeline {
                    pathwlBirc = JENKINS_FILE[BRANCH_NAME]['pathwlBirc'];
                    clusterWlBirc = JENKINS_FILE[BRANCH_NAME]['clusterWlBirc'];
                    extension = JENKINS_FILE[BRANCH_NAME]['extension'];
+                    projectName = JENKINS_FILE[BRANCH_NAME]['projectName'];
 
-                   remote.name = 'birc'
+                   remote.name = projectName
                    remote.host = JENKINS_FILE[BRANCH_NAME]['serverWlSsh']
                    remote.port = JENKINS_FILE[BRANCH_NAME]['puertoWlSsh']
                    remote.allowAnyHosts = true 
