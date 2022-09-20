@@ -32,7 +32,7 @@ pipeline {
                 sh '''
                     cd Back
                     mvn clean install
-                    ls -la
+                    ls -la target
                 '''
                 stash includes: 'Back/dist/', name: 'artefact'
             }
