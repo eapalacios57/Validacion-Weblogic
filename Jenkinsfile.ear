@@ -49,7 +49,7 @@ pipeline {
                    JENKINS_FILE = readJSON file: 'Jenkinsfile.json';
                    urlWlBirc  = JENKINS_FILE[BRANCH_NAME]['urlWlBirc'];
                    idUserANDPassWlBirc = JENKINS_FILE[BRANCH_NAME]['idUserANDPassWlBirc'];
-                   artifactNameWlBirc = JENKINS_FILE[BRANCH_NAME]['artifactNameWlBirc'];
+                   artifactNameWlBirc = "TrainingSite-1.0-SNAPSHOT";
                    domainWlBirc = JENKINS_FILE[BRANCH_NAME]['domainWlBirc'];
                    pathwlBirc = JENKINS_FILE[BRANCH_NAME]['pathwlBirc'];
                    clusterWlBirc = JENKINS_FILE[BRANCH_NAME]['clusterWlBirc'];
