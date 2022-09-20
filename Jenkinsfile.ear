@@ -12,16 +12,16 @@ pipeline {
         
     }  
     stages {
-        stage('Test'){
-            when { anyOf { branch 'develop';  branch 'stage'; branch 'master' } }
-            agent {
-                label 'docker'
-            } 
-            steps {
-                sh 'docker run --rm -v /root/.m2:/root/.m2 -v $PWD/Back:/app -w /app maven:3-alpine mvn test'
-                stash includes: 'Back/target/', name: 'mysrc'
-            }
-        }
+        // stage('Test'){
+        //     when { anyOf { branch 'develop';  branch 'stage'; branch 'master' } }
+        //     agent {
+        //         label 'docker'
+        //     } 
+        //     steps {
+        //         sh 'docker run --rm -v /root/.m2:/root/.m2 -v $PWD/Back:/app -w /app maven:3-alpine mvn test'
+        //         stash includes: 'Back/target/', name: 'mysrc'
+        //     }
+        // }
 
         stage("Build") {
             when { anyOf { branch 'develop'; branch 'stage'; branch 'master' } }
