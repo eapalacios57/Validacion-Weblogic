@@ -57,8 +57,8 @@ pipeline {
                    extension = JENKINS_FILE[BRANCH_NAME]['extension'];
 
                    remote.name = 'birc'
-                   remote.host = JENKINS_FILE[BRANCH_NAME]['serverWlSshBirc']
-                   remote.port = JENKINS_FILE[BRANCH_NAME]['puertoWlSshBirc']
+                   remote.host = JENKINS_FILE[BRANCH_NAME]['serverWlSsh']
+                   remote.port = JENKINS_FILE[BRANCH_NAME]['puertoWlSsh']
                    remote.allowAnyHosts = true 
                    remote.pty = true
                 }
