@@ -161,7 +161,7 @@ pipeline {
                 script{
                     echo "Estatus Code Stage Anterior(Stop App): ${statusCodeStop}";
                     if( statusCodeStop == 'success' ){
-                        sshCommand remote: remote, command: "cd  ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl $urlWl -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -undeploy -name ${artifactNameWl} -targets ${clusterWl} -usenonexclusivelock -graceful -ignoresessions"
+                        sshCommand remote: remote, command: "cd  ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -undeploy -name ${artifactNameWl} -targets ${clusterWl} -usenonexclusivelock -graceful -ignoresessions"
                     } else {
                         ///validar que en el pipe line no salga en verde 
                         echo "Sin artefacto para hacer undeploy"
