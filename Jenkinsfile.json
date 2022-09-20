@@ -7,7 +7,7 @@
         "artifactNameWl": "FacturaElectronicaEAR",
         "domainWl": "/oracle/app/wlogic12c/Oracle/Middleware/Oracle_Home/user_projects/domains/transversalestest/bin/",
         "pathWl": "/oracle/app/wlogic12c/Oracle/Middleware/Oracle_Home/user_projects/domains/base_domain/deploysJenkins/App/birc",
-        "clusterWl": "Cluster_Transversales2",                                                        
+        "clusterWl": "Transversales3",                                                        
         "serverWlSsh":"10.1.20.14",
         "puertoWlSsh":22
     }
