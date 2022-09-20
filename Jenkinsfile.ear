@@ -52,7 +52,7 @@ pipeline {
                    idUserANDPassShh = JENKINS_FILE[BRANCH_NAME]['idUserANDPassShh'];
                    artifactNameWl = "TrainingSite-1.0-SNAPSHOT";
                    domainWl = JENKINS_FILE[BRANCH_NAME]['domainWl'];
-                   pathwl = JENKINS_FILE[BRANCH_NAME]['pathwl'];
+                   pathWl = JENKINS_FILE[BRANCH_NAME]['pathWl'];
                    clusterWl = JENKINS_FILE[BRANCH_NAME]['clusterWl'];
                    extension = JENKINS_FILE[BRANCH_NAME]['extension'];
                    projectName = JENKINS_FILE[BRANCH_NAME]['projectName'];
