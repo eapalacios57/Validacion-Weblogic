@@ -34,7 +34,7 @@ pipeline {
                     mvn clean install
                     ls -la target
                 '''
-                stash includes: 'Back/dist/', name: 'artefact'
+                stash includes: 'Back/target/TrainingSite-1.0-SNAPSHOT.war', name: 'artefact'
             }
         }
         //Setea las variables almacenas en el arhivo .JSON
