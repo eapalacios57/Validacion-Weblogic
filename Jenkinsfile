@@ -195,13 +195,6 @@ pipeline {
 
                     echo "backup ";
                     ///validar la existenia de carpetas y de artefacto al cual se le deva crear un backups.
-                    sshCommand remote: remote, sudo: true, command:"test -f ${pathWl}/Deploy/${JOB_BASE_NAME}/ || sudo mkdir -p  ${pathWl}/Deploy/${JOB_BASE_NAME}/ && test -f  ${pathWl}/DeploysHistory/${JOB_BASE_NAME} || sudo mkdir -p  ${pathWl}/DeploysHistory/${JOB_BASE_NAME}"
-
-                    sshCommand remote: remote, sudo: true, command:"test -f ${pathWl}/Deploy/${JOB_BASE_NAME}/${artifactNameWl}.${extension} && sudo mv ${pathWl}/Deploy/${JOB_BASE_NAME}/${artifactNameWl}.${extension} ${pathWl}/DeploysHistory/${JOB_BASE_NAME}/${artifactNameWl}_`date +\"%Y-%m-%d-%Y_%H:%M\"`.${extension} || echo \"No se encontro artefacto para realizar backup\""
-
-                    sshCommand remote: remote, sudo: true, command:"mv ${pathWl}/DeploysTemp/${JOB_BASE_NAME}/${artifactNameWl}.${extension}  ${pathWl}/Deploy/${JOB_BASE_NAME}"
-                    
-                    sshCommand remote: remote, sudo: true, command:"rm -rf ${pathWl}/DeploysTemp/${JOB_BASE_NAME}/${artifactNameWl}.${extension}"
                 }
                 unstable {
                     println "Stage Deploy <<<<<< unstable >>>>>>"
