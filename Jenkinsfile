@@ -13,17 +13,6 @@ pipeline {
         
     }  
     stages {
-        // stage('Test'){
-        //     when { anyOf { branch 'develop';  branch 'stage'; branch 'master' } }
-        //     agent {
-        //         label 'docker'
-        //     } 
-        //     steps {
-        //         sh 'docker run --rm -v /root/.m2:/root/.m2 -v $PWD/Back:/app -w /app maven:3-alpine mvn test'
-        //         stash includes: 'Back/target/', name: 'mysrc'
-        //     }
-        // }
-
         stage("Build") {
             when { anyOf { branch 'develop'; branch 'stage'; branch 'master' } }
             agent {
@@ -86,135 +75,100 @@ pipeline {
                 }
             }
         }
-        // stage('Stop App'){
-        //     agent {
-        //         label 'master' 
-        //     }
-        //     environment {
-        //         WEBLOGIC_CREDENTIAL = credentials("${idUserANDPassWl}")
-        //     }  
-        //     when { anyOf { branch 'develop'; branch 'stage'; branch 'master' } } 
-        //     steps{
-        //         script{
-        //             try{
-        //                 sshCommand remote: remote, command: "cd ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -stop -name $artifactNameWl"
-        //                 statusCodeStop='success';
-        //             } catch (err) {
-        //                 statusCodeStop='failure';
-        //                 statusCodeUndeploy='failure';   
-        //                 echo "Error al parar la aplicacion"
-        //             }
-        //         }
-        //     }
-        //     post {
-        //         success {
-        //             println "Stage Stop App <<<<<< success >>>>>>"
-        //         }
-        //         unstable {
-        //             println "Stage Stop App <<<<<< unstable >>>>>>"    
-        //             script{
-        //                 statusCodeStop='unstable';
-        //                 statusCodeUndeploy='failure';
-        //             }              
-        //         }
-        //         failure {
-        //             println "Stage Stop App <<<<<< failure >>>>>>"
-        //             script{
-        //                 statusCodeStop='failure';
-        //                 statusCodeUndeploy='failure';
-        //             }
-        //         }
-        //     }   
+        stage('Stop App'){
+            agent {
+                label 'master' 
+            }
+            environment {
+                WEBLOGIC_CREDENTIAL = credentials("${idUserANDPassWl}")
+            }  
+            when { anyOf { branch 'develop'; branch 'stage'; branch 'master' } } 
+            steps{
+                script{
+                    try{
+                        sshCommand remote: remote, command: "cd ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -stop -name $artifactNameWl"
+                        statusCodeStop='success';
+                    } catch (err) {
+                        statusCodeStop='failure';
+                        statusCodeUndeploy='failure';   
+                        echo "Error al parar la aplicacion"
+                    }
+                }
+            }
+            post {
+                success {
+                    println "Stage Stop App <<<<<< success >>>>>>"
+                }
+                unstable {
+                    println "Stage Stop App <<<<<< unstable >>>>>>"    
+                    script{
+                        statusCodeStop='unstable';
+                        statusCodeUndeploy='failure';
+                    }              
+                }
+                failure {
+                    println "Stage Stop App <<<<<< failure >>>>>>"
+                    script{
+                        statusCodeStop='failure';
+                        statusCodeUndeploy='failure';
+                    }
+                }
+            }   
                
-        // }
-        // stage('Undeploy'){
-        //    agent {
-        //         label 'master' 
-        //     }
-        //     environment {
-        //         WEBLOGIC_CREDENTIAL = credentials("${idUserANDPassWl}")
-        //     }  
-        //    when { anyOf { branch 'develop';  branch 'stage'; branch 'master' } } 
-        //    steps{
-        //        //Manejo del status code de este stage
-        //         script{
-        //             echo "Estatus Code Stage Anterior(Stop App): ${statusCodeStop}";
-        //             if( statusCodeStop == 'success' ){
-        //                 sshCommand remote: remote, command: "cd  ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -undeploy -name ${artifactNameWl} -targets ${clusterWl} -usenonexclusivelock -graceful -ignoresessions"
-        //             } else {
-        //                 ///validar que en el pipe line no salga en verde 
-        //                 echo "Sin artefacto para hacer undeploy"
-        //             }
-        //         }
-        //     }
-        //     post {
-        //        success {
-        //             println "Stage Undeploy <<<<<< success >>>>>>"
-        //             script{
-        //                 if( statusCodeStop == 'success' ){
-        //                     statusCodeUndeploy='success';
-        //                 }else{
-        //                     statusCodeUndeploy='failure';
-        //                 }
-        //             }
-        //         }
-        //         unstable {
-        //             script{
-        //                 statusCodeUndeploy='unstable';
-        //             } 
-        //             println "Stage Undeploy <<<<<< unstable >>>>>>"
-        //        }
-        //        failure {
-        //             println "Stage Undeploy <<<<<< failure >>>>>>"   
-        //             script{
-        //                 if( statusCodeStop == 'success' ){
-        //                     echo "Start App";
-        //                     sshCommand remote: remote, sudo:true, command:"sh ${domainWl}/setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -start -name ${artifactNameWl}"
+        }
+        stage('Undeploy'){
+           agent {
+                label 'master' 
+            }
+            environment {
+                WEBLOGIC_CREDENTIAL = credentials("${idUserANDPassWl}")
+            }  
+           when { anyOf { branch 'develop';  branch 'stage'; branch 'master' } } 
+           steps{
+               //Manejo del status code de este stage
+                script{
+                    echo "Estatus Code Stage Anterior(Stop App): ${statusCodeStop}";
+                    if( statusCodeStop == 'success' ){
+                        sshCommand remote: remote, command: "cd  ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.Deployer -adminurl $urlWl -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -undeploy -name ${artifactNameWl} -targets ${clusterWl} -usenonexclusivelock -graceful -ignoresessions"
+                    } else {
+                        ///validar que en el pipe line no salga en verde 
+                        echo "Sin artefacto para hacer undeploy"
+                    }
+                }
+            }
+            post {
+               success {
+                    println "Stage Undeploy <<<<<< success >>>>>>"
+                    script{
+                        if( statusCodeStop == 'success' ){
+                            statusCodeUndeploy='success';
+                        }else{
+                            statusCodeUndeploy='failure';
+                        }
+                    }
+                }
+                unstable {
+                    script{
+                        statusCodeUndeploy='unstable';
+                    } 
+                    println "Stage Undeploy <<<<<< unstable >>>>>>"
+               }
+               failure {
+                    println "Stage Undeploy <<<<<< failure >>>>>>"   
+                    script{
+                        if( statusCodeStop == 'success' ){
+                            echo "Start App";
+                            sshCommand remote: remote, sudo:true, command:"sh ${domainWl}/setDomainEnv.sh ENV && java weblogic.Deployer -adminurl ${urlWl} -username ${WEBLOGIC_CREDENTIAL_USR} -password ${WEBLOGIC_CREDENTIAL_PSW} -start -name ${artifactNameWl}"
                             
-        //                     autoCancelled = true
-        //                     error('Error al hacer undeploy se inicia de nuevo el artefacto')
-        //                 }    
+                            autoCancelled = true
+                            error('Error al hacer undeploy se inicia de nuevo el artefacto')
+                        }    
 
-        //                 statusCodeUndeploy='failure';
-        //             }
-        //         }
-        //     }              
-        // }
-        // stage('shutdown cluster'){      
-        //     agent {
-        //         label 'master' 
-        //     }
-        //     environment {
-        //         WEBLOGIC_CREDENTIAL = credentials("${idUserANDPassWl}")
-        //     }  
-        //     when { 
-        //         branch 'master'
-        //         equals expected:true, actual:shutdownCluster 
-        //     } 
-        //     steps{
-        //         sh """
-        //             rm -rf shutdown.py
-                    
-        //             touch shutdown.py
-        //             echo 'print("Conección con el servidor ${clusterWl}")' >> shutdown.py 
-        //             echo 'connect("${WEBLOGIC_CREDENTIAL_USR}","${WEBLOGIC_CREDENTIAL_PSW}","${urlWl}")' >> shutdown.py
-        //             echo 'print("shutdown: ${clusterWl}")' >> shutdown.py
-        //             echo 'shutdown("${clusterWl}")' >> shutdown.py
-        //             echo 'print("state: ${clusterWl}")' >> shutdown.py
-        //             echo 'state("${clusterWl}")' >> shutdown.py
-        //         """
-
-        //         sshPut remote: remote, from: "shutdown.py", into: "/home/devops/applications/${projectName}/DeploysTemp/"
-
-        //         sshCommand remote: remote, command: "cd ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.WLST  /home/devops/applications/${projectName}/DeploysTemp/shutdown.py"
-                
-        //         sshCommand remote: remote, command: "rm /home/devops/applications/${projectName}/DeploysTemp/shutdown.py"
-
-        //         sh """
-        //             rm -rf shutdown.py
-        //         """
-        //     }
-        // }
+                        statusCodeUndeploy='failure';
+                    }
+                }
+            }              
+        }
         stage('Deploy'){      
             agent {
                 label 'master' 
@@ -272,47 +226,6 @@ pipeline {
             }
                 
         }
-        // stage('start cluster'){      
-        //     agent {
-        //         label 'master' 
-        //     }
-        //     environment {
-        //         WEBLOGIC_CREDENTIAL = credentials("${idUserANDPassWl}")
-        //     }  
-        //     when { 
-        //         branch 'master'
-        //         equals expected:true, actual:shutdownCluster 
-        //     } 
-        //     steps{
-        //         sshCommand remote: remote, sudo:true, command:"test -f ${pathWl}/DeploysTemp/${BRANCH_NAME} || sudo mkdir -p ${pathWl}/DeploysTemp/${BRANCH_NAME} && sudo chown -R wlogic12c:oinstall ${pathWl}/"                                
-        //         sshCommand remote: remote, sudo:true, command:"mv /home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME}/${artifactNameWl}.${extension} ${pathWl}/DeploysTemp/${BRANCH_NAME}"
-        //         sshCommand remote: remote, sudo:true, command:"chown  wlogic12c:oinstall ${pathWl}/DeploysTemp/${BRANCH_NAME}/${artifactNameWl}.${extension}"
-                
-        //         sh """
-        //             rm -rf startCluster.py
-                    
-        //             touch startCluster.py
-        //             echo 'print("Conección con el servidor ${clusterWl}")' >> startCluster.py 
-        //             echo 'connect("${WEBLOGIC_CREDENTIAL_USR}","${WEBLOGIC_CREDENTIAL_PSW}","${urlWl}")' >> startCluster.py
-        //             echo 'print("deploy  app in ${clusterWl}")' >> startCluster.py 
-        //             echo 'deploy("${artifactNameWl}", "${pathWl}/DeploysTemp/${BRANCH_NAME}/${artifactNameWl}.${extension}", "${clusterWl}")' >> startCluster.py
-        //             echo 'print("start: ${clusterWl}")' >> startCluster.py
-        //             echo 'start("${clusterWl}")' >> startCluster.py
-        //             echo 'print("state: ${clusterWl}")' >> startCluster.py
-        //             echo 'state("${clusterWl}")' >> startCluster.py
-        //         """
-
-        //         sshPut remote: remote, from: "startCluster.py", into: "/home/devops/applications/${projectName}/DeploysTemp/"
-
-        //         sshCommand remote: remote, command: "cd ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.WLST  /home/devops/applications/${projectName}/DeploysTemp/startCluster.py"
-                
-        //         sshCommand remote: remote, command: "rm /home/devops/applications/${projectName}/DeploysTemp/startCluster.py"
-
-        //         sh """
-        //             rm -rf startCluster.py
-        //         """
-        //     }
-        // }
     }
     post {         
         always{
