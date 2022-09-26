@@ -9,6 +9,7 @@ pipeline {
     }
     environment {
         WEBLOGIC_CREDENTIAL = credentials('weblogic-console-user')
+        BRANCH_NAME= 'stage'
         
     }  
     stages {
