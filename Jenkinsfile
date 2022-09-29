@@ -76,7 +76,7 @@ pipeline {
             }
         }
         stage ("Aprobación GC"){
-            when { anyOf { branch 'stage'; branch 'master' } }
+            when { anyOf { branch 'develop'; branch 'stage'; branch 'master' } }
             steps{
                 script{
                     try {
