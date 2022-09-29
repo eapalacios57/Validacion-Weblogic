@@ -75,6 +75,22 @@ pipeline {
                 }
             }
         }
+        stage ("Aprobación GC"){
+            when { anyOf { branch 'stage'; branch 'master' } }
+            steps{
+                script{
+                    try {
+                        timeout(time: 24, unit: 'HOURS'){
+                        input(message: "Desea autorizar el despliegue?", 
+                            parameters: [ [$class: 'BooleanParameterDefinition', defaultValue:false, name: 'Aprobar'] ])
+                        }
+                    }
+                    catch(err){
+                        echo $err;
+                    }
+                }
+            }
+        }
         stage('Stop App'){
             agent {
                 label 'master' 
