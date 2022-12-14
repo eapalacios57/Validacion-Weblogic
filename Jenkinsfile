@@ -43,7 +43,7 @@ pipeline {
                    idUserANDPassShh = JENKINS_FILE[BRANCH_NAME]['idUserANDPassShh'];
                    artifactNameWl = "TrainingSite-1.0-SNAPSHOT";
                    ServidorWL1 = "Transversales3";
-                   ServidorWL2 = "Transversales4"
+                   ServidorWL2 = "Transversales4";
                    domainWl = JENKINS_FILE[BRANCH_NAME]['domainWl'];
                    pathWl = JENKINS_FILE[BRANCH_NAME]['pathWl'];
                    clusterWl = JENKINS_FILE[BRANCH_NAME]['clusterWl'];
