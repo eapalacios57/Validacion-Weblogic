@@ -25,7 +25,7 @@ pipeline {
                     def SCANNERHOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'                 
                     withSonarQubeEnv('SonarQubeCore') {
                         def sonarProjectKey= sh( returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectKey=').split('=')[1].trim()
-                        def sonarProjectName= sh(returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectName=').split('=')[1].trim().concat('-'+BRANCH_NAME)
+                        def sonarProjectName= sh(returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectName=').split('=')[1].trim()
                         sh """
                             ${SCANNERHOME}/bin/sonar-scanner \
                                 -Dsonar.projectKey=${sonarProjectKey}-${BRANCH_NAME} \
