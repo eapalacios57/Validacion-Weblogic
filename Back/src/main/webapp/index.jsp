@@ -44,7 +44,7 @@
             <div id="logoSura"></div>
             <div id="wrappertop"></div>
             <div id="wrappermiddle">                
-                <h2>Hola equipo 28/05/2021</h2>                
+                <h2>Hola equipos de nuevo 28/05/2021</h2>                
                 <form method="post" action="GestionSesiones" name="loginForm" >
                     <div id="username_input">
                         <div id="username_inputleft"></div>
@@ -78,9 +78,9 @@
                     }
                 %>
                 <div id="links_left">
-                    <a href="#">Olvidaste tu Contraseña?</a>
+                    <a href="#">Olvidaste tu Contraseï¿½a?</a>
                 </div>
-                <div id="links_right"><a href="#">Aún no estas Registrado?</a></div>
+                <div id="links_right"><a href="#">Aï¿½n no estas Registrado?</a></div>
             </div>
             <div id="wrapperbottom"></div>		
             <div id="powered">
