@@ -23,9 +23,9 @@ pipeline {
                 script {
                     last_stage = env.STAGE_NAME
                     def SCANNERHOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'                 
-                    def sonarProjectKey= sh( returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectKey=').split('=')[1].trim()
-                    def sonarProjectName= sh(returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectName=').split('=')[1].trim()
                     withSonarQubeEnv('SonarQubeCore') {
+                        def sonarProjectKey= sh( returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectKey=').split('=')[1].trim()
+                        def sonarProjectName= sh(returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectName=').split('=')[1].trim()
                         sh """
                             ${SCANNERHOME}/bin/sonar-scanner \
                                 -Dsonar.projectKey=${sonarProjectKey}-${BRANCH_NAME} \
