@@ -14,6 +14,27 @@ pipeline {
 
     }
     stages {
+        stage('SonarQube analysis') {
+            when { anyOf { branch 'develop'; branch 'stage'; branch 'master' } }
+            agent {
+                    label 'nodejenkinsjdk11' 
+            }      
+            steps {
+                script {
+                    last_stage = env.STAGE_NAME
+                    def SCANNERHOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'                 
+                    withSonarQubeEnv('SonarQubeCore') {
+                        def sonarProjectKey= sh( returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectKey=').split('=')[1].trim()
+                        def sonarProjectName= sh(returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectName=').split('=')[1].trim()
+                        sh """
+                            ${SCANNERHOME}/bin/sonar-scanner \
+                                -Dsonar.projectKey=${sonarProjectKey}-${BRANCH_NAME} \
+                                -Dsonar.projectName=${sonarProjectName}-${BRANCH_NAME} \
+                        """
+                    }
+                }
+            }                            
+        }
         stage("Build") {
             when { anyOf { branch 'develop'; branch 'stage'; branch 'master' } }
             agent {
