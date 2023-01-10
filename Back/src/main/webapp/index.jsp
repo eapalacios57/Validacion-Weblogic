@@ -44,7 +44,7 @@
             <div id="logoSura"></div>
             <div id="wrappertop"></div>
             <div id="wrappermiddle">                
-                <h2>Hola equipos de nuevo 28/05/2021</h2>                
+                <h2>Hola equipos de nuevos  28/05/2023</h2>                
                 <form method="post" action="GestionSesiones" name="loginForm" >
                     <div id="username_input">
                         <div id="username_inputleft"></div>
