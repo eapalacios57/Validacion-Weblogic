@@ -79,7 +79,36 @@ pipeline {
                 }
             }
         }
-
+                stage("Validating Server"){
+            agent{
+                label 'master'
+            }
+            when { anyOf { branch 'stage'; } }
+            steps{
+                script{
+                    sh "if [ -f statusServer.py ] ; then rm statusServer.py ; fi"
+                    status_weblogic.statusStage("${WEBLOGIC_CREDENTIAL_USR}", "${WEBLOGIC_CREDENTIAL_PSW}", "${urlWl}", "${ServidorWL1}", "${ServidorWL2}")
+                    sshPut remote: remote, from: "statusServer.py", into: "/home/devops/python/"
+                    sshCommand remote: remote, command: "cd  ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.WLST /home/devops/python/statusServer.py"
+                    sshCommand remote: remote, command: "rm /home/devops/python/statusServer.py"
+                    sh "rm statusServer.py"
+                }
+            }
+            post {
+                success {
+                    println "Validation Server <<<<<< success >>>>>>"
+                }
+                unstable {
+                    println "Validation Server <<<<<< unstable >>>>>>"
+                }
+                failure {
+                    println "Validation Server <<<<<< failure >>>>>>"
+                    script{
+                       sshCommand remote: remote, command: "rm /home/devops/python/statusServer.py" 
+                    }
+                }
+            }
+        }
         stage("Build") {
             when { anyOf { branch 'develop';  branch 'stage'} }
             agent {
