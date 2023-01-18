@@ -15,7 +15,7 @@ node('master'){
         checkout scm
         def JENKINS_FILE = readJSON(text: readFile("./Jenkinsfile.json").trim());
         def channelName = JENKINS_FILE['channelName']
-        buildWithTags =  JENKINS_FILE['buildWithTags']
+        buildWithTags =  false
         slackSend(channel:channelName, teamDomain: 'SegurosBolivar', tokenCredentialId: 'jenkins-slack-chanel', color: '#FFFF00', message: ": `${env.JOB_NAME}` #${env.BUILD_NUMBER}: Entorno ${BRANCH_NAME}\n(<${env.BUILD_URL}|Open>)")
     }
 }
