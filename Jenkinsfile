@@ -4,6 +4,14 @@ def commit = ''
 def profile = ''
 def buildWithTags = ''
 
+def renameArtefactory(){
+    if(renameArtefacts) {
+    path_artefact = sh (returnStdout: true, script: "cd ${pathArct} && find . -type f -name '*.${extension}'").split("./")[1].trim()
+    sh "mv ${pathArct}/${path_artefact} ${pathArct}/${artifactNameWl}.${extension}"
+    }
+    stash includes: "SimonWS/target/${artifactNameWl}.${extension}", name: 'artefact'
+}
+
 // def notifications(String buildStatus = "Inicio La Ejecución Del Pipeline"){
 //     def JENKINS_FILE = readJSON(text: readFile("./Jenkinsfile.json").trim());
 //     def channelName = JENKINS_FILE['channelName']
@@ -74,7 +82,7 @@ pipeline {
                 }
             }
             steps{
-                sleep(time: 60, unit: "SECONDS")
+                // sleep(time: 60, unit: "SECONDS")
                 script{
                    JENKINS_FILE = readJSON file: 'Jenkinsfile.json';
                    urlWl  = JENKINS_FILE[branchEnv]['urlWl'];
@@ -104,43 +112,43 @@ pipeline {
                 }
             }
         }
-                stage("Validating Server"){
-            agent{
-                label 'master'
-            }
-            environment {
-                WEBLOGIC_CREDENTIAL = credentials("${idUserANDPassWl}")
-            }
-            when { anyOf { branch 'stage'; } }
-            steps{
-                script{
-                    withCredentials([usernamePassword(credentialsId: "${idUserANDPassShh}", passwordVariable: 'password', usernameVariable: 'userName')]) {
-                            remote.user = userName
-                            remote.password = password
-                    }
-                    sh "if [ -f statusServer.py ] ; then rm statusServer.py ; fi"
-                    status_weblogic.statusStage("${WEBLOGIC_CREDENTIAL_USR}", "${WEBLOGIC_CREDENTIAL_PSW}", "${urlWl}", "${serverWl1}", "${serverWl2}")
-                    sshPut remote: remote, from: "statusServer.py", into: "/home/devops/python/"
-                    sshCommand remote: remote, command: "cd  ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.WLST /home/devops/python/statusServer.py"
-                    sshCommand remote: remote, command: "rm /home/devops/python/statusServer.py"
-                    sh "rm statusServer.py"
-                }
-            }
-            post {
-                success {
-                    println "Validation Server <<<<<< success >>>>>>"
-                }
-                unstable {
-                    println "Validation Server <<<<<< unstable >>>>>>"
-                }
-                failure {
-                    println "Validation Server <<<<<< failure >>>>>>"
-                    script{
-                       sshCommand remote: remote, command: "rm /home/devops/python/statusServer.py" 
-                    }
-                }
-            }
-        }
+        // stage("Validating Server"){
+        //     agent{
+        //         label 'master'
+        //     }
+        //     environment {
+        //         WEBLOGIC_CREDENTIAL = credentials("${idUserANDPassWl}")
+        //     }
+        //     when { anyOf { branch 'stage'; } }
+        //     steps{
+        //         script{
+        //             withCredentials([usernamePassword(credentialsId: "${idUserANDPassShh}", passwordVariable: 'password', usernameVariable: 'userName')]) {
+        //                     remote.user = userName
+        //                     remote.password = password
+        //             }
+        //             sh "if [ -f statusServer.py ] ; then rm statusServer.py ; fi"
+        //             status_weblogic.statusStage("${WEBLOGIC_CREDENTIAL_USR}", "${WEBLOGIC_CREDENTIAL_PSW}", "${urlWl}", "${serverWl1}", "${serverWl2}")
+        //             sshPut remote: remote, from: "statusServer.py", into: "/home/devops/python/"
+        //             sshCommand remote: remote, command: "cd  ${domainWl} && . ./setDomainEnv.sh ENV && java weblogic.WLST /home/devops/python/statusServer.py"
+        //             sshCommand remote: remote, command: "rm /home/devops/python/statusServer.py"
+        //             sh "rm statusServer.py"
+        //         }
+        //     }
+        //     post {
+        //         success {
+        //             println "Validation Server <<<<<< success >>>>>>"
+        //         }
+        //         unstable {
+        //             println "Validation Server <<<<<< unstable >>>>>>"
+        //         }
+        //         failure {
+        //             println "Validation Server <<<<<< failure >>>>>>"
+        //             script{
+        //                sshCommand remote: remote, command: "rm /home/devops/python/statusServer.py" 
+        //             }
+        //         }
+        //     }
+        // }
         stage("Build") {
             when { anyOf { branch 'develop';  branch 'stage'} }
             agent {
@@ -157,16 +165,11 @@ pipeline {
                                 sh "mvn -P${profiles} clean install -Dmaven.test.skip=true --settings Settings.xml"
                             }else{
                                 sh "cd Back && mvn clean install"
+                                renameArtefactory()
                             }
                         }
                     break
                 }
-                if(renameArtefacts) {
-                    path_artefact = sh (returnStdout: true, script: "cd ${pathArct} && find . -type f -name '*.${extension}'").split("./")[1].trim()
-                    sh "mv ${pathArct}/${path_artefact} ${pathArct}/${artifactNameWl}.${extension}"
-                }
-
-                stash includes: "SimonWS/target/${artifactNameWl}.${extension}", name: 'artefact'
 
                 //         configMaven.config()
 
