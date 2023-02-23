@@ -155,10 +155,11 @@ pipeline {
                 label 'master' 
             }
             steps {
+                echo "currentResult: ${currentBuild.currentResult}"
                 script{
                 // echo "${commandBuild[0]}"
                 switch("${buildTool}"){
-                    case "maven":
+                    case "docker":
                         node('maven385java8'){
                             checkout scm
                             if(profile){
@@ -173,6 +174,26 @@ pipeline {
 
                 //         configMaven.config()
 
+                }
+            }
+        }
+        stage('Upload Artifact'){
+            agent {
+                label 'master'
+            }
+            when { anyOf { branch 'develop';  branch 'stage'; branch 'master' } }
+            steps{
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script{
+                        withCredentials([usernamePassword(credentialsId: "${idUserANDPassShh}", passwordVariable: 'password', usernameVariable: 'userName')]) {
+                            remote.user = userName
+                            remote.password = password
+                        }
+                        echo "Copy ear to Server Web Logic";
+                        unstash 'artefact'
+                        // sshCommand remote: remote, command: "test -f /home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME} || mkdir -p /home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME}/"
+                        sshPut remote: remote, from: "Back/target/${artifactNameWl}.${extension}", into: "/home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME}/"
+                    }
                 }
             }
         }
