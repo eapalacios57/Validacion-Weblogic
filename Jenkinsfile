@@ -19,7 +19,7 @@ def tags(){
     def parts = repository.split('/')
     def owner = parts[3]
     def repo  = parts[4].replaceAll('\\.git', '')
-    def response = sh(script: 'curl -H "Authorization: token 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"' + " https://api.github.com/repos/$owner/$repo/tags", returnStdout: true)
+    def response = sh(script: 'curl -H "Authorization: token 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"' + " https://api.github.com/repos/$owner/$repo/tags", returnStdout: true)
     def tags = readJSON(text: response)
     def listTags = []
     tags.each { tag ->
