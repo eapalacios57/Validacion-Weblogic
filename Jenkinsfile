@@ -12,19 +12,23 @@ def renameArtefactory(){
     stash includes: "SimonWS/target/${artifactNameWl}.${extension}", name: 'artefact'
 }
 
-// def notifications(String buildStatus = "Inicio La Ejecución Del Pipeline"){
-//     def JENKINS_FILE = readJSON(text: readFile("./Jenkinsfile.json").trim());
-//     def channelName = JENKINS_FILE['channelName']
-//     buildWithTags = JENKINS_FILE['buildWithTags']
-//     slackSend(channel:channelName, teamDomain: 'SegurosBolivar', tokenCredentialId: 'jenkins-slack-chanel', color: '#FFFF00', message: "${buildStatus}: `${env.JOB_NAME}` #${env.BUILD_NUMBER}: Entorno ${BRANCH_NAME}\n(<${env.BUILD_URL}|Open>)")
-// }
-node('master'){
-    stage('Notification Incial'){
-        checkout scm
-        def JENKINS_FILE = readJSON(text: readFile("./Jenkinsfile.json").trim());
-        def channelName = JENKINS_FILE['channelName']
-        buildWithTags =  false
-        slackSend(channel:channelName, teamDomain: 'SegurosBolivar', tokenCredentialId: 'jenkins-slack-chanel', color: '#FFFF00', message: ": `${env.JOB_NAME}` #${env.BUILD_NUMBER}: Entorno ${BRANCH_NAME}\n(<${env.BUILD_URL}|Open>)")
+def tags(){
+    node('master'){
+    checkout scm
+    def repository = scm.userRemoteConfigs[0].url
+    echo "${repository}"
+    def parts = repository.split('/')
+    def owner = parts[3]
+    def repo  = parts[4].replaceAll('\\.git', '')
+    def response = sh(script: 'curl -H "Authorization: token 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"' + " https://api.github.com/repos/$owner/$repo/tags", returnStdout: true)
+    def tags = readJSON(text: response)
+    def listTags = []
+    tags.each { tag ->
+        if(tag.name ==~  /^v\d*\.\d*\.\d*\.\d*/){
+            listTags << tag.name
+        }
+    }
+    return listTags
     }
 }
 pipeline {  
@@ -35,6 +39,10 @@ pipeline {
                     numToKeepStr: '10'
             )
         disableConcurrentBuilds()
+    }
+    parameters {
+        choice(name: 'Release',
+               choices: tags())
     }
     stages {
         stage('SonarQube analysis') {
@@ -57,9 +65,23 @@ pipeline {
                     profiles = ( branchEnv == "master") ? "prod": ( branchEnv == "stage")? "stage": "dev";
                     echo "${branchEnv}"
                     echo "${buildWithTags}"
+                    def parts = GIT_URL.split('/')
+                    def owner = parts[3]
+                    def repo  = parts[4].replaceAll('\\.git', '')
+                    def response = sh(script: 'curl -H "Authorization: token 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"' + " https://api.github.com/repos/$owner/$repo/tags", returnStdout: true)
+                    def tags = readJSON(text: response)
+                    def listTags = []
+                    tags.each { tag ->
+                        listTags << tag.name
+                    }
+                    //def repo =  GIT_URL.split('/')[4]
+                    ////def url = "https://api.github.com/repos/$owner/$repo/tags"
+                    //def tagList = sh(returnStdout: true, script: "git tag").trim()
+                    echo "${listTags}"
                }
            }                            
         }
+        
         stage('Set variables'){
             agent {
                 label 'master' 
@@ -149,54 +171,55 @@ pipeline {
         //         }
         //     }
         // }
-        stage("Build") {
-            when { anyOf { branch 'develop';  branch 'stage'} }
-            agent {
-                label 'master' 
-            }
-            steps {
-                echo "currentResult: ${currentBuild.currentResult}"
-                script{
-                // echo "${commandBuild[0]}"
-                switch("${buildTool}"){
-                    case "docker":
-                        node('maven385java8'){
-                            checkout scm
-                            if(profile){
-                                sh "mvn -P${profiles} clean install -Dmaven.test.skip=true --settings Settings.xml"
-                            }else{
-                                sh "cd Back && mvn clean install"
-                                renameArtefactory()
-                            }
-                        }
-                    break
-                }
-
+        //stage("Build") {
+        //    when { anyOf { branch 'develop';  branch 'stage'} }
+        //    agent {
+        //        label 'master' 
+        //    }
+        //    steps {
+        //        
+        //        script{
+        //        // echo "${commandBuild[0]}"
+        //        echo "currentResult: ${currentBuild.currentResult}"
+        //        switch("${buildTool}"){
+        //            case "docker":
+        //                node('maven385java8'){
+        //                    checkout scm
+        //                    if(profile){
+        //                        sh "mvn -P${profiles} clean install -Dmaven.test.skip=true --settings Settings.xml"
+        //                    }else{
+        //                        sh "cd Back && mvn clean install"
+        //                        renameArtefactory()
+        //                    }
+        //                }
+        //            break
+        //        }
+//
                 //         configMaven.config()
-
-                }
-            }
-        }
-        stage('Upload Artifact'){
-            agent {
-                label 'master'
-            }
-            when { anyOf { branch 'develop';  branch 'stage'; branch 'master' } }
-            steps{
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    script{
-                        withCredentials([usernamePassword(credentialsId: "${idUserANDPassShh}", passwordVariable: 'password', usernameVariable: 'userName')]) {
-                            remote.user = userName
-                            remote.password = password
-                        }
-                        echo "Copy ear to Server Web Logic";
-                        unstash 'artefact'
-                        // sshCommand remote: remote, command: "test -f /home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME} || mkdir -p /home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME}/"
-                        sshPut remote: remote, from: "Back/target/${artifactNameWl}.${extension}", into: "/home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME}/"
-                    }
-                }
-            }
-        }
+//
+        //        }
+        //    }
+        //}
+        //stage('Upload Artifact'){
+        //    agent {
+        //        label 'master'
+        //    }
+        //    when { anyOf { branch 'develop';  branch 'stage'; branch 'master' } }
+        //    steps{
+        //        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+        //            script{
+        //                withCredentials([usernamePassword(credentialsId: "${idUserANDPassShh}", passwordVariable: 'password', usernameVariable: 'userName')]) {
+        //                    remote.user = userName
+        //                    remote.password = password
+        //                }
+        //                echo "Copy ear to Server Web Logic";
+        //                unstash 'artefact'
+        //                // sshCommand remote: remote, command: "test -f /home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME} || mkdir -p /home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME}/"
+        //                sshPut remote: remote, from: "Back/target/${artifactNameWl}.${extension}", into: "/home/devops/applications/${projectName}/DeploysTemp/${BRANCH_NAME}/"
+        //            }
+        //        }
+        //    }
+        //}
     }
     post {         
         always{
