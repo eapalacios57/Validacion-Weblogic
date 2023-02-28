@@ -13,8 +13,6 @@ def renameArtefactory(){
 }
 
 def tags(){
-    node('master'){
-    checkout scm
     def repository = scm.userRemoteConfigs[0].url
     echo "${repository}"
     def parts = repository.split('/')
@@ -29,7 +27,6 @@ def tags(){
         }
     }
     return listTags
-    }
 }
 pipeline {  
     agent any
