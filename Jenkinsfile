@@ -14,12 +14,19 @@ pipeline {
                 label 'master'
             }
             steps {
-                sh '''
-                    cd Back
-                    mvn clean install
-                    ls -la target
-                '''
-                stash includes: 'Back/target/TrainingSite-1.0-SNAPSHOT.war', name: 'artefact'
+                script{
+                    sonarProjectKey= sh( returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectKey=').split('=')[1].trim()
+                    sonarProjectName= sh(returnStdout: true, script:"cat sonar-project.properties | awk -F '=' '/^sonar/{print \$2}' | sed -n 2p").trim()
+                    def SCANNERHOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+
+                    withSonarQubeEnv('SonarQube') {
+                         sh """
+                                 ${SCANNERHOME}/bin/sonar-scanner \
+                                   -Dsonar.projectKey=${sonarProjectKey}-${profiles} \
+                                   -Dsonar.projectName=${sonarProjectName}-${profiles} \
+                            """
+                    }
+                }
             }
         }
     }   
