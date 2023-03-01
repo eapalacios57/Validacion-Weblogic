@@ -15,15 +15,18 @@ pipeline {
             }
             steps {
                 script{
+                    def changedFiles = sh(script: "git diff --name-only HEAD~1", returnStdout: true).trim()
+                    def changedFilesList = changedFiles.replaceAll('\n', ',')
                     sonarProjectKey= sh( returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectKey=').split('=')[1].trim()
                     sonarProjectName= sh(returnStdout: true, script:"cat sonar-project.properties | awk -F '=' '/^sonar/{print \$2}' | sed -n 2p").trim()
-                    def SCANNERHOME = tool name: 'SonarQube', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    def SCANNERHOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
 
                     withSonarQubeEnv('SonarQube') {
                          sh """
                                  ${SCANNERHOME}/bin/sonar-scanner \
-                                   -Dsonar.projectKey=${sonarProjectKey} \
-                                   -Dsonar.projectName=${sonarProjectName} \
+                                   -Dsonar.projectKey=${sonarProjectKey}-${profiles} \
+                                   -Dsonar.projectName=${sonarProjectName}-${profiles} \
+                                   -Dsonar.inclusions=${changedFilesList} \
                             """
                     }
                 }
