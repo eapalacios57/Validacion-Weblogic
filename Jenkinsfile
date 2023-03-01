@@ -1,4 +1,3 @@
-
 def remote = [:]
 pipeline {
     agent any
@@ -23,7 +22,6 @@ pipeline {
                 stash includes: 'Back/target/TrainingSite-1.0-SNAPSHOT.war', name: 'artefact'
             }
         }
-      }
     }   
     post {
         always{
