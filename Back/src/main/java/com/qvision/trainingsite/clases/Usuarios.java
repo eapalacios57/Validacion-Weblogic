@@ -15,7 +15,7 @@ public class Usuarios {
     private String passUsu = "";
 
     public String getNomUsu() {
-        return nomUsu;
+        return nom;
     }
 
     public void setNomUsu(String nomUsu) {
