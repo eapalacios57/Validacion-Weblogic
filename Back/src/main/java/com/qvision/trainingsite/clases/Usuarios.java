@@ -11,7 +11,7 @@ package com.qvision.trainingsite.clases;
  */
 public class Usuarios {
     
-    private String nomUsu = "";
+    private String nom = "";
     private String passUsu = "";
 
     public String getNomUsu() {
