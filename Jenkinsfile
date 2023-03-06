@@ -8,6 +8,16 @@ pipeline {
             )
     }
     stages {
+        stage('Test'){
+            when { anyOf { branch 'develop';  branch 'stage'; branch 'master' } }
+            agent {
+                label 'docker'
+            } 
+            steps {
+                sh 'docker run --rm -v /root/.m2:/root/.m2 -v $PWD/Back:/app -w /app maven:3-alpine mvn test'
+                stash includes: 'Back/target/', name: 'mysrc'
+            }
+        }
         stage("Sonar") {
             when { anyOf { branch 'develop'; branch 'stage'; branch 'master' } }
             agent {
@@ -19,16 +29,17 @@ pipeline {
                     def changedFilesList = changedFiles.replaceAll('\n', ',')
                     sonarProjectKey= sh( returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectKey=').split('=')[1].trim()
                     sonarProjectName= sh(returnStdout: true, script:"cat sonar-project.properties | awk -F '=' '/^sonar/{print \$2}' | sed -n 2p").trim()
-                    def SCANNERHOME = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-
-                    withSonarQubeEnv('SonarQube') {
-                         sh """
-                                 ${SCANNERHOME}/bin/sonar-scanner \
-                                   -Dsonar.projectKey=${sonarProjectKey}-${profiles} \
-                                   -Dsonar.projectName=${sonarProjectName}-${profiles} \
-                                   -Dsonar.inclusions=${changedFilesList} \
-                            """
-                    }
+                    def SCANNERHOME = tool name: 'SonarQube', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    unstash 'mysrc'
+                    echo "${changedFilesList}"
+                    // withSonarQubeEnv('SonarQube') {
+                    //      sh """
+                    //              ${SCANNERHOME}/bin/sonar-scanner \
+                    //                -Dsonar.projectKey=${sonarProjectKey} \
+                    //                -Dsonar.projectName=${sonarProjectName} \
+                    //                -Dsonar.inclusions=${changedFilesList} \
+                    //         """
+                    // }
                 }
             }
         }
