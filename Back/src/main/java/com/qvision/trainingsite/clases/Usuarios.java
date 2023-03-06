@@ -30,4 +30,8 @@ public class Usuarios {
         this.passUsu = passUsu;
     }
     
+    public String getUserPass() {
+        return passUsu;
+    }
+    
 }
