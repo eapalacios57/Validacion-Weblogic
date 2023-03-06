@@ -18,8 +18,8 @@ public class Usuarios {
         return nom;
     }
 
-    public void setNomUsu(String nomUsu) {
-        this.nomUsu = nomUsu;
+    public void setNomUsu(String nom) {
+        this.nom = nom;
     }
 
     public String getPassUsu() {
