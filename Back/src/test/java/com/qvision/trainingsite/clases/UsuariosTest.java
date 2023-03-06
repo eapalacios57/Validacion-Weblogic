@@ -55,9 +55,9 @@ public class UsuariosTest {
     @org.junit.Test
     public void testSetNomUsu() {
         System.out.println("setNomUsu");
-        String nomUsu = "qmatic@qvision.com.co";
+        String nom = "qmatic@qvision.com.co";
         Usuarios instance = new Usuarios();
-        instance.setNomUsu(nomUsu);        
+        instance.setNomUsu(nom);        
     }
 
     /**
