@@ -12,24 +12,24 @@ def renameArtefactory(){
     stash includes: "SimonWS/target/${artifactNameWl}.${extension}", name: 'artefact'
 }
 
-def tags(){
-    node('master'){
-    def repository = scm.userRemoteConfigs[0].url
-    echo "${repository}"
-    def parts = repository.split('/')
-    def owner = parts[3]
-    def repo  = parts[4].replaceAll('\\.git', '')
-    def response = sh(script: 'curl -H "Authorization: token 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"' + " https://api.github.com/repos/$owner/$repo/tags", returnStdout: true)
-    def tags = readJSON(text: response)
-    def listTags = []
-    tags.each { tag ->
-        if(tag.name ==~  /^v\d*\.\d*\.\d*\.\d*/){
-            listTags << tag.name
-        }
-    }
-       return listTags
-    }
-}
+// def tags(){
+//     node('master'){
+//     def repository = scm.userRemoteConfigs[0].url
+//     echo "${repository}"
+//     def parts = repository.split('/')
+//     def owner = parts[3]
+//     def repo  = parts[4].replaceAll('\\.git', '')
+//     def response = sh(script: 'curl -H "Authorization: token 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"' + " https://api.github.com/repos/$owner/$repo/tags", returnStdout: true)
+//     def tags = readJSON(text: response)
+//     def listTags = []
+//     tags.each { tag ->
+//         if(tag.name ==~  /^v\d*\.\d*\.\d*\.\d*/){
+//             listTags << tag.name
+//         }
+//     }
+//        return listTags
+//     }
+// }
 pipeline {  
     agent any
     options {
@@ -39,10 +39,10 @@ pipeline {
             )
         disableConcurrentBuilds()
     }
-    parameters {
-        choice(name: 'Release',
-               choices: tags())
-    }
+    // parameters {
+    //     choice(name: 'Release',
+    //            choices: tags())
+    // }
     stages {
         stage('SonarQube analysis') {
            when { anyOf { branch 'develop'; branch 'stage'; tag "v*-release"; tag "v*" } }
@@ -53,26 +53,32 @@ pipeline {
             //    notifications()
                echo "ANALISIS DE CODIGO"
                script {
-                    branchEnv = BRANCH_NAME
-                    if(BRANCH_NAME ==~ /^v\d*\.\d*\.\d*\.\d*-release$/){
-                         branchEnv = 'stage'
+                    def applications = ["SimonWeb", "testfile"]
+                    JENKINS_FILE = readJSON file: 'Jenkinsfile.json';
+                    projectName = JENKINS_FILE['projectName']
+                    if(applications.contains('${projectName}')){
+                        echo "Hello Word"
                     }
-                    if(BRANCH_NAME ==~ /^v\d*\.\d*\.\d*\.\d*/){
-                         branchEnv = 'master'
-                    }
-                    last_stage = env.STAGE_NAME
-                    profiles = ( branchEnv == "master") ? "prod": ( branchEnv == "stage")? "stage": "dev";
-                    echo "${branchEnv}"
-                    echo "${buildWithTags}"
-                    def parts = GIT_URL.split('/')
-                    def owner = parts[3]
-                    def repo  = parts[4].replaceAll('\\.git', '')
-                    def response = sh(script: 'curl -H "Authorization: token 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"' + " https://api.github.com/repos/$owner/$repo/tags", returnStdout: true)
-                    def tags = readJSON(text: response)
-                    def listTags = []
-                    tags.each { tag ->
-                        listTags << tag.name
-                    }
+                    // branchEnv = BRANCH_NAME
+                    // if(BRANCH_NAME ==~ /^v\d*\.\d*\.\d*\.\d*-release$/){
+                    //      branchEnv = 'stage'
+                    // }
+                    // if(BRANCH_NAME ==~ /^v\d*\.\d*\.\d*\.\d*/){
+                    //      branchEnv = 'master'
+                    // }
+                    // last_stage = env.STAGE_NAME
+                    // profiles = ( branchEnv == "master") ? "prod": ( branchEnv == "stage")? "stage": "dev";
+                    // echo "${branchEnv}"
+                    // echo "${buildWithTags}"
+                    // def parts = GIT_URL.split('/')
+                    // def owner = parts[3]
+                    // def repo  = parts[4].replaceAll('\\.git', '')
+                    // def response = sh(script: 'curl -H "Authorization: token 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"' + " https://api.github.com/repos/$owner/$repo/tags", returnStdout: true)
+                    // def tags = readJSON(text: response)
+                    // def listTags = []
+                    // tags.each { tag ->
+                    //     listTags << tag.name
+                    // }
                     //def repo =  GIT_URL.split('/')[4]
                     ////def url = "https://api.github.com/repos/$owner/$repo/tags"
                     //def tagList = sh(returnStdout: true, script: "git tag").trim()
