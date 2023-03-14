@@ -56,9 +56,7 @@ pipeline {
                     def applications = ["SimonWeb", "testfile"]
                     JENKINS_FILE = readJSON file: 'Jenkinsfile.json';
                     projectName = JENKINS_FILE['projectName']
-                    if(applications.contains('${projectName}')){
-                        echo "Hello Word"
-                    }
+                    
                     // branchEnv = BRANCH_NAME
                     // if(BRANCH_NAME ==~ /^v\d*\.\d*\.\d*\.\d*-release$/){
                     //      branchEnv = 'stage'
@@ -82,7 +80,7 @@ pipeline {
                     //def repo =  GIT_URL.split('/')[4]
                     ////def url = "https://api.github.com/repos/$owner/$repo/tags"
                     //def tagList = sh(returnStdout: true, script: "git tag").trim()
-                    echo "${listTags}"
+                    // echo "${listTags}"
                }
            }                            
         }
@@ -225,6 +223,26 @@ pipeline {
         //        }
         //    }
         //}
+        stage('Smoke Test') {
+                // when { anyOf { tag "v*-release"; tag "v*" } }
+            when{
+                expression {
+                    BRANCH_NAME ==~ /(develop|stage|master|^v\d*\.\d*\.\d*\.\d*-release$|^v\d*\.\d*\.\d*\.\d*)/
+                }
+            }
+            agent {
+                label 'newman' 
+            }  
+            steps {
+                script{
+                if(applications.contains('${projectName}')){
+                    git branch: 'master', credentialsId: 'jenkins-bolivar', url: 'https://github.com/segurosbolivar/tests-on-enviroments.git'
+                    sh "newman run simonws_status_collection.json -e simonws/develop_enviroment.json"
+                    }
+                }
+                // waitForQualityGate abortPipeline: true
+            }
+        }
     }
     post {         
         always{
