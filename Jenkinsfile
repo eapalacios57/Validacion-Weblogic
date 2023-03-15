@@ -25,7 +25,7 @@ pipeline {
             }
             steps {
                 script{
-                    def changedFiles = sh(script: "git diff --name-only HEAD~1", returnStdout: true).trim()
+                    def changedFiles = sh(script: " git diff --name-only HEAD~1 HEAD | awk -F/ '{print \$1}' | uniq", returnStdout: true).trim()
                     def changedFilesList = changedFiles.replaceAll('\n', ',')
                     sonarProjectKey= sh( returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectKey=').split('=')[1].trim()
                     sonarProjectName= sh(returnStdout: true, script:"cat sonar-project.properties | awk -F '=' '/^sonar/{print \$2}' | sed -n 2p").trim()
