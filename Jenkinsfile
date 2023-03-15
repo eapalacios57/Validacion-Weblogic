@@ -3,6 +3,7 @@ def remote = [:]
 def commit = ''
 def profile = ''
 def buildWithTags = ''
+def applicationsSmoke = ["simonws", "simoncotizadores"]
 
 def renameArtefactory(){
     if(renameArtefacts) {
