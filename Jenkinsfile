@@ -27,6 +27,7 @@ pipeline {
                 script{
                     def changedFiles = sh(script: " git diff --name-only HEAD~1 HEAD | awk -F/ '{print \$1}' | uniq", returnStdout: true).trim()
                     def changedFilesList = changedFiles.replaceAll('\n', ',')
+                    sh "find Back/ -name sonar-project.properties"
                     sonarProjectKey= sh( returnStdout: true, script:'cat sonar-project.properties | grep sonar.projectKey=').split('=')[1].trim()
                     sonarProjectName= sh(returnStdout: true, script:"cat sonar-project.properties | awk -F '=' '/^sonar/{print \$2}' | sed -n 2p").trim()
                     def SCANNERHOME = tool name: 'SonarQube', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
